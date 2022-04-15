@@ -7,5 +7,6 @@ Rails.application.routes.draw do
                sessions: :sessions
              }
 
+  resources :ping, only: [:index]
   get '/*a', to: 'application#not_found'
 end
