@@ -1,5 +1,6 @@
 class RegistrationsController < Devise::RegistrationsController
   skip_before_action :authorize_request, only: :create
+  skip_before_action :authenticate_scope!, only: :destroy
 
   def create
     user = User.new(sign_up_params)
