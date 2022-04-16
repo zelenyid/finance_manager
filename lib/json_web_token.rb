@@ -1,6 +1,6 @@
 class JsonWebToken
   SECRET_KEY = Rails.application.secrets.secret_key_base.to_s
-  ALGORITHM = 'HS256'.freeze  # TODO: move to env
+  ALGORITHM = ENV['JWT_ALGORITHM']
 
   def self.encode(payload, exp = 24.hours)
     now = Time.now.to_i
