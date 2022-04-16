@@ -7,7 +7,7 @@ module Denylist
     end
 
     def self.revoke_jwt(payload)
-      find_or_create_by!(jti: payload['jti'], expired_at: Time.at(payload['exp'].to_i))
+      find_or_create_by!(jti: payload['jti'], expired_at: Time.zone.at(payload['exp'].to_i))
     end
   end
 end

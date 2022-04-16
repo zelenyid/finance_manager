@@ -1,13 +1,14 @@
 class JsonWebToken
   SECRET_KEY = Rails.application.secrets.secret_key_base.to_s
-  ALGORITHM = "HS256"
+  ALGORITHM = 'HS256'.freeze  # TODO: move to env
 
   def self.encode(payload, exp = 24.hours)
     now = Time.now.to_i
+
     payload[:iat] ||= now
-    payload[:exp] ||= (now + exp).to_i
+    payload[:exp] ||= now + exp.to_i
     payload[:jti] ||= SecureRandom.uuid
-    JWT.encode payload, SECRET_KEY
+    JWT.encode payload, SECRET_KEY, ALGORITHM
   end
 
   def self.decode(token)

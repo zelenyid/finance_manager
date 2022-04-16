@@ -15,9 +15,13 @@ class ApplicationController < ActionController::API
     begin
       @jwt_payload = JsonWebToken.decode(header)
       @current_user_id = @jwt_payload[:id]
-      raise JWT::DecodeError, 'revoked token' if JwtDenylist.jwt_revoked?(@jwt_payload)
-    rescue ActiveRecord::RecordNotFound, JWT::DecodeError => e
+      check_valid_user(@jwt_payload, current_user)
+    rescue ActiveRecord::RecordNotFound, JWT::DecodeError
       render json: { error: 'Not authorized' }, status: :unauthorized
+    rescue Errors::RevokedToken
+      render json: { error: 'Token is revoked' }, status: :unauthorized
+    rescue Errors::NilUser
+      render json: { error: 'User not found' }, status: :unauthorized
     end
   end
 
@@ -31,5 +35,10 @@ class ApplicationController < ActionController::API
 
   def signed_in?
     @current_user_id.present?
+  end
+
+  def check_valid_user(payload, user)
+    raise Errors::NilUser, 'nil user' unless user
+    raise Errors::RevokedToken, 'revoked token' if JwtDenylist.jwt_revoked?(payload)
   end
 end

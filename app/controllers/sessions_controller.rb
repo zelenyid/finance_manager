@@ -1,6 +1,5 @@
-class SessionsController < Devise::SessionsController
+class SessionsController < ApplicationController
   skip_before_action :authorize_request, only: :create
-  skip_before_action :verify_signed_out_user
 
   def create
     user = User.find_by(email: sign_in_params[:email])
@@ -15,6 +14,12 @@ class SessionsController < Devise::SessionsController
 
   def destroy
     JwtDenylist.revoke_jwt(@jwt_payload)
-    render json: { status: "Successfully logout" }, status: :ok
+    render json: { status: 'Successfully logout' }, status: :ok
+  end
+
+  private
+
+  def sign_in_params
+    params.require(:user).permit(:email, :password)
   end
 end
